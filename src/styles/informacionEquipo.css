@@ -1,0 +1,124 @@
+
+/* INFORMACIÓN DEL EQUIPO */
+
+.equipment-info-section {
+    max-width: 1000px;
+    min-height: 650px;
+    margin: auto;
+    padding: 75px 24px 100px;
+}
+
+.equipment-info-card {
+    max-width: 760px;
+    margin: auto;
+    padding: 45px;
+    background: white;
+    border: 2px solid var(--border);
+    border-radius: 26px;
+    box-shadow: 8px 8px 0 var(--border);
+}
+
+.equipment-info-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.equipment-info-type {
+    padding: 8px 14px;
+    background: var(--mint);
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 750;
+}
+
+.equipment-info-card h1 {
+    margin: 35px 0 15px;
+    font-size: clamp(27px, 4vw, 36px);
+    line-height: 1.3;
+    letter-spacing: -1px;
+}
+
+.equipment-info-description {
+    color: #575365;
+    line-height: 1.7;
+}
+
+.equipment-info-form {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+    margin-top: 35px;
+}
+
+.equipment-info-field {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.equipment-info-field label {
+    font-size: 14px;
+    font-weight: 750;
+}
+
+.equipment-info-field input,
+.equipment-info-field select,
+.equipment-info-field textarea {
+    width: 100%;
+    padding: 16px 18px;
+    background: var(--background);
+    border: 2px solid var(--border);
+    border-radius: 14px;
+    color: var(--text);
+    font: inherit;
+    font-size: 14px;
+    outline: none;
+    transition: background 0.2s, box-shadow 0.2s;
+}
+
+.equipment-info-field input:focus,
+.equipment-info-field select:focus,
+.equipment-info-field textarea:focus {
+    background: white;
+    box-shadow: 4px 4px 0 var(--lavender);
+}
+
+.equipment-info-field textarea {
+    resize: vertical;
+    min-height: 110px;
+}
+
+.equipment-info-field input::placeholder,
+.equipment-info-field textarea::placeholder {
+    color: #777380;
+}
+
+.equipment-info-help {
+    color: #716D7C;
+    font-size: 12px;
+    line-height: 1.6;
+}
+
+/* RESPONSIVE */
+
+@media (max-width: 600px) {
+    .equipment-info-section {
+        padding: 50px 20px 80px;
+    }
+
+    .equipment-info-card {
+        padding: 28px 20px;
+    }
+
+    .equipment-info-card .question-actions {
+        flex-wrap: wrap;
+    }
+
+    .equipment-info-card .question-actions button {
+        width: 100%;
+    }
+}

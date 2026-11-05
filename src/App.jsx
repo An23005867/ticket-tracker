@@ -1,122 +1,202 @@
-import { useState } from 'react'
-import heroImg from './assets/hero.png'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import './App.css'
+
+import { useState } from 'react';
+import SeleccionEquipo from './components/SeleccionEquipo';
+import InformacionEquipo from './components/InformacionEquipo';
+import SeleccionCategoria from './components/SeleccionCategoria';
+import Cuestionario from './components/Cuestionario';
+import cuestionarios from './data/cuestionarios';
+import './App.css';
+
+const datosIniciales = {
+    marca: '',
+    modelo: '',
+    sistema: '',
+    componentes: ''
+};
 
 function App() {
-  const [count, setCount] = useState(0)
+    const [pantalla, setPantalla] = useState('inicio');
+    const [tipoEquipo, setTipoEquipo] = useState('');
+    const [datosEquipo, setDatosEquipo] = useState({ ...datosIniciales });
+    const [categoria, setCategoria] = useState('');
 
-  return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
+    function cambiarPantalla(destino) {
+        setPantalla(destino);
+        window.scrollTo(0, 0);
+    }
 
-      <div className="ticks"></div>
+    function iniciarDiagnostico() {
+        setTipoEquipo('');
+        setDatosEquipo({ ...datosIniciales });
+        setCategoria('');
+        cambiarPantalla('equipo');
+    }
 
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
+    function continuarCategoria() {
+        if (!categoria) return;
 
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+        if (!cuestionarios[categoria]) {
+            alert('El cuestionario de esta categoría estará disponible próximamente.');
+            return;
+        }
+
+        cambiarPantalla('cuestionario');
+    }
+
+    return (
+        <div className="site-container">
+            <header className="navbar">
+                <a className="brand" href="#inicio" onClick={() => cambiarPantalla('inicio')}>
+                    <span className="brand-icon">DT</span>
+                    <span>Diagnóstico Técnico</span>
+                </a>
+
+                <nav className="nav-links" aria-label="Navegación principal">
+                    <a href="#inicio" onClick={() => cambiarPantalla('inicio')}>Inicio</a>
+                    <a href="#como-funciona" onClick={() => cambiarPantalla('inicio')}>
+                        ¿Cómo funciona?
+                    </a>
+                </nav>
+            </header>
+
+            <main>
+                {pantalla === 'inicio' && (
+                    <>
+                        <section className="hero" id="inicio">
+                            <div className="hero-content">
+                                <span className="hero-tag">SOPORTE TÉCNICO INTELIGENTE</span>
+
+                                <h1>Entiende qué le pasa a tu computadora.</h1>
+
+                                <p>
+                                    Identifica posibles problemas en tu computadora
+                                    mediante un diagnóstico guiado, sencillo y rápido.
+                                    Obtén recomendaciones antes de solicitar asistencia técnica.
+                                </p>
+
+                                <button
+                                    type="button"
+                                    className="primary-button"
+                                    onClick={iniciarDiagnostico}
+                                >
+                                    Iniciar diagnóstico <span aria-hidden="true">→</span>
+                                </button>
+
+                                <span className="hero-note">
+                                    Para computadoras de escritorio y laptops.
+                                </span>
+                            </div>
+
+                            <div className="hero-visual" aria-hidden="true">
+                                <div className="visual-window">
+                                    <div className="window-header">
+                                        <span className="window-dot"></span>
+                                        <span className="window-dot"></span>
+                                        <span className="window-dot"></span>
+                                    </div>
+
+                                    <div className="window-content">
+                                        <div className="computer-icon">
+                                            <div className="computer-screen">
+                                                <span>?</span>
+                                            </div>
+                                            <div className="computer-stand"></div>
+                                        </div>
+
+                                        <div className="status-label">
+                                            Analizando tu equipo...
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+
+                        <section className="how-section" id="como-funciona">
+                            <div className="section-heading">
+                                <span className="section-tag">PROCESO SENCILLO</span>
+                                <h2>¿Cómo funciona?</h2>
+                                <p>Tres pasos para entender mejor el problema de tu computadora.</p>
+                            </div>
+
+                            <div className="steps-grid">
+                                <article className="step-card step-lavender">
+                                    <span className="step-number">01</span>
+                                    <div className="step-icon" aria-hidden="true">⌕</div>
+                                    <h3>Identifica el problema</h3>
+                                    <p>
+                                        Selecciona tu tipo de equipo y describe
+                                        el inconveniente que estás experimentando.
+                                    </p>
+                                </article>
+
+                                <article className="step-card step-mint">
+                                    <span className="step-number">02</span>
+                                    <div className="step-icon" aria-hidden="true">☑</div>
+                                    <h3>Responde las preguntas</h3>
+                                    <p>
+                                        Sigue un cuestionario guiado que nos ayudará
+                                        a identificar las posibles causas.
+                                    </p>
+                                </article>
+
+                                <article className="step-card step-peach">
+                                    <span className="step-number">03</span>
+                                    <div className="step-icon" aria-hidden="true">✓</div>
+                                    <h3>Obtén recomendaciones</h3>
+                                    <p>
+                                        Recibe un diagnóstico preliminar y conoce
+                                        los siguientes pasos recomendados.
+                                    </p>
+                                </article>
+                            </div>
+                        </section>
+                    </>
+                )}
+
+                {pantalla === 'equipo' && (
+                    <SeleccionEquipo
+                        tipoEquipo={tipoEquipo}
+                        setTipoEquipo={setTipoEquipo}
+                        continuar={() => tipoEquipo && cambiarPantalla('informacion')}
+                        volver={() => cambiarPantalla('inicio')}
+                    />
+                )}
+
+                {pantalla === 'informacion' && (
+                    <InformacionEquipo
+                        tipoEquipo={tipoEquipo}
+                        datosEquipo={datosEquipo}
+                        setDatosEquipo={setDatosEquipo}
+                        continuar={() => datosEquipo.marca.trim() && cambiarPantalla('categoria')}
+                        volver={() => cambiarPantalla('equipo')}
+                    />
+                )}
+
+                {pantalla === 'categoria' && (
+                    <SeleccionCategoria
+                        categoria={categoria}
+                        setCategoria={setCategoria}
+                        continuar={continuarCategoria}
+                        volver={() => cambiarPantalla('informacion')}
+                    />
+                )}
+
+                {pantalla === 'cuestionario' && (
+                    <Cuestionario
+                        categoria={categoria}
+                        tipoEquipo={tipoEquipo}
+                        datosEquipo={datosEquipo}
+                        volver={() => cambiarPantalla('categoria')}
+                    />
+                )}
+            </main>
+
+            <footer className="footer">
+                <span>Diagnóstico Técnico</span>
+                <p>Orientación técnica para computadoras de escritorio y laptops.</p>
+            </footer>
+        </div>
+    );
 }
 
-export default App
+export default App;
