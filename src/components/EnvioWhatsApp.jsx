@@ -1,15 +1,11 @@
-
-import { useState } from 'react';
 import categorias from '../data/categorias';
 import '../styles/envioWhatsApp.css';
 
-// Número del técnico: código de país + número, sin espacios ni símbolos.
-// Ejemplo de formato: 502XXXXXXXX
 const NUMERO_TECNICO = '50236326513';
 
-function EnvioWhatsApp({ tipoEquipo, datosEquipo, categoria, cuestionario, resultado, historial }) {
-    const [nombre, setNombre] = useState('');
-    const [telefono, setTelefono] = useState('');
+function EnvioWhatsApp({ tipoEquipo, datosEquipo, categoria, cuestionario, resultado, historial, ticketCreado, datosContacto }) {
+    const nombre = datosContacto?.nombre?.trim() || 'No proporcionado';
+    const telefono = datosContacto?.telefono?.trim() || 'No proporcionado';
 
     const nombreEquipo = tipoEquipo === 'laptop' ? 'Laptop' : 'Computadora de escritorio';
     const nombreCategoria = categorias.find(item => item.id === categoria)?.nombre || categoria;
@@ -24,13 +20,18 @@ function EnvioWhatsApp({ tipoEquipo, datosEquipo, categoria, cuestionario, resul
         }).join('\n\n');
 
         const recomendaciones = resultado.recomendaciones
-            .map((item, index) => `${index + 1}. ${item}`).join('\n');
+            .map((item, index) => `${index + 1}. ${item}`)
+            .join('\n');
+
+        const informacionTicket = ticketCreado?.codigo
+            ? `*TICKET DE SOPORTE*\nCódigo: ${ticketCreado.codigo}\nEstado: ${ticketCreado.estado || 'pendiente'}\n\n`
+            : '';
 
         return `*SOLICITUD DE ASISTENCIA TÉCNICA*
 
-*DATOS DEL USUARIO*
-Nombre: ${nombre.trim() || 'No proporcionado'}
-Teléfono: ${telefono.trim() || 'No proporcionado'}
+${informacionTicket}*DATOS DEL USUARIO*
+Nombre: ${nombre}
+Teléfono: ${telefono}
 
 *INFORMACIÓN DEL EQUIPO*
 Tipo: ${nombreEquipo}
@@ -46,7 +47,7 @@ Resultado: ${resultado.titulo}
 ${resultado.descripcion}
 
 *RESPUESTAS DEL CUESTIONARIO*
-${respuestas}
+${respuestas || 'No se registraron respuestas.'}
 
 *RECOMENDACIONES*
 ${recomendaciones}
@@ -59,51 +60,33 @@ Este resultado es orientativo y no sustituye una evaluación profesional.`;
         if (!numeroValido) return;
 
         const mensaje = encodeURIComponent(generarMensaje());
-        const enlace = `https://wa.me/${NUMERO_TECNICO}?text=${mensaje}`;
-
-        window.open(enlace, '_blank', 'noopener,noreferrer');
+        window.open(
+            `https://wa.me/${NUMERO_TECNICO}?text=${mensaje}`,
+            '_blank',
+            'noopener,noreferrer'
+        );
     }
 
     return (
         <div className="whatsapp-card">
             <div className="whatsapp-heading">
-                <span className="whatsapp-icon" aria-hidden="true">✉</span>
-
-                <div>
-                    <h2>¿Necesitas asistencia técnica?</h2>
-                    <p>Comparte tu diagnóstico con un técnico a través de WhatsApp.</p>
-                </div>
+                <span className="section-tag">CONTACTO DIRECTO</span>
+                <h2>Enviar diagnóstico por WhatsApp</h2>
+                <p>
+                    Comparte el resultado de tu diagnóstico con soporte técnico
+                    para recibir asistencia personalizada.
+                </p>
             </div>
 
-            <div className="whatsapp-fields">
-                <div className="whatsapp-field">
-                    <label htmlFor="nombre-contacto">Tu nombre (opcional)</label>
-                    <input
-                        id="nombre-contacto"
-                        type="text"
-                        maxLength={80}
-                        placeholder="Ej. Juan Pérez"
-                        value={nombre}
-                        onChange={e => setNombre(e.target.value)}
-                    />
-                </div>
-
-                <div className="whatsapp-field">
-                    <label htmlFor="telefono-contacto">Número de contacto (opcional)</label>
-                    <input
-                        id="telefono-contacto"
-                        type="tel"
-                        maxLength={20}
-                        placeholder="Ej. +502 1234 5678"
-                        value={telefono}
-                        onChange={e => setTelefono(e.target.value)}
-                    />
-                </div>
+            <div className="whatsapp-summary">
+                <p><strong>Nombre:</strong> {nombre}</p>
+                <p><strong>Teléfono:</strong> {telefono}</p>
+                <p><strong>Ticket:</strong> {ticketCreado?.codigo || 'No registrado'}</p>
             </div>
 
             <p className="whatsapp-notice">
-                Al continuar, los datos que proporciones se incluirán en el mensaje
-                preparado para WhatsApp. Podrás revisarlo antes de enviarlo.
+                Los datos de contacto se toman del formulario de creación del ticket.
+                El token privado de seguimiento no se comparte por WhatsApp.
             </p>
 
             <button
@@ -116,8 +99,8 @@ Este resultado es orientativo y no sustituye una evaluación profesional.`;
             </button>
 
             {!numeroValido && (
-                <p className="whatsapp-pending">
-                    El número de WhatsApp del técnico está pendiente de configuración.
+                <p className="ticket-error" role="alert">
+                    El número de soporte técnico no está configurado correctamente.
                 </p>
             )}
         </div>

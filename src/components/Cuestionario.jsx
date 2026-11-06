@@ -1,8 +1,8 @@
-
 import { useState } from 'react';
 import cuestionarios from '../data/cuestionarios';
 import categorias from '../data/categorias';
 import EnvioWhatsApp from './EnvioWhatsApp';
+import CrearTicket from './CrearTicket';
 import '../styles/cuestionario.css';
 
 function Cuestionario({ categoria, tipoEquipo, datosEquipo, volver }) {
@@ -13,6 +13,8 @@ function Cuestionario({ categoria, tipoEquipo, datosEquipo, volver }) {
     const [preguntaActual, setPreguntaActual] = useState(cuestionario.inicio);
     const [respuesta, setRespuesta] = useState(null);
     const [historial, setHistorial] = useState([]);
+    const [ticketCreado, setTicketCreado] = useState(null);
+    const [datosContacto, setDatosContacto] = useState({ nombre: '', telefono: '' });
 
     const pregunta = cuestionario.preguntas[preguntaActual];
     const resultado = cuestionario.resultados[preguntaActual];
@@ -32,8 +34,8 @@ function Cuestionario({ categoria, tipoEquipo, datosEquipo, volver }) {
 
         setHistorial([...historial, {
             pregunta: preguntaActual,
-            respuesta: respuesta,
-            siguiente: siguiente
+            respuesta,
+            siguiente
         }]);
 
         setPreguntaActual(siguiente);
@@ -59,6 +61,9 @@ function Cuestionario({ categoria, tipoEquipo, datosEquipo, volver }) {
         setPreguntaActual(cuestionario.inicio);
         setRespuesta(null);
         setHistorial([]);
+        setTicketCreado(null);
+        setDatosContacto({ nombre: '', telefono: '' });
+        sessionStorage.removeItem('ticket-tracker-solicitud');
         window.scrollTo(0, 0);
     }
 
@@ -66,10 +71,8 @@ function Cuestionario({ categoria, tipoEquipo, datosEquipo, volver }) {
         return (
             <section className="question-section result-section">
                 <div className="result-layout">
-
                     <div className="result-main-card">
                         <span className="section-tag">DIAGNÓSTICO PRELIMINAR</span>
-
                         <div className="result-symbol" aria-hidden="true">✓</div>
 
                         <h1>{resultado.titulo}</h1>
@@ -89,7 +92,6 @@ function Cuestionario({ categoria, tipoEquipo, datosEquipo, volver }) {
 
                         <div className="recommendations">
                             <h2>Recomendaciones</h2>
-
                             <ul>
                                 {resultado.recomendaciones.map((item, index) => (
                                     <li key={index}>{item}</li>
@@ -106,6 +108,7 @@ function Cuestionario({ categoria, tipoEquipo, datosEquipo, volver }) {
                         <div className="result-summary-card">
                             <div className="result-side-heading">
                                 <span className="result-side-icon" aria-hidden="true">☷</span>
+
                                 <div>
                                     <h2>Resumen del diagnóstico</h2>
                                     <p>Consulta las respuestas proporcionadas.</p>
@@ -135,6 +138,17 @@ function Cuestionario({ categoria, tipoEquipo, datosEquipo, volver }) {
                             </details>
                         </div>
 
+                        <CrearTicket
+                            tipoEquipo={tipoEquipo}
+                            datosEquipo={datosEquipo}
+                            categoria={categoria}
+                            resultado={resultado}
+                            historial={historial}
+                            cuestionario={cuestionario}
+                            onTicketCreado={setTicketCreado}
+                            onDatosContacto={setDatosContacto}
+                        />
+
                         <EnvioWhatsApp
                             tipoEquipo={tipoEquipo}
                             datosEquipo={datosEquipo}
@@ -142,6 +156,8 @@ function Cuestionario({ categoria, tipoEquipo, datosEquipo, volver }) {
                             cuestionario={cuestionario}
                             resultado={resultado}
                             historial={historial}
+                            ticketCreado={ticketCreado}
+                            datosContacto={datosContacto}
                         />
                     </div>
                 </div>
@@ -164,13 +180,10 @@ function Cuestionario({ categoria, tipoEquipo, datosEquipo, volver }) {
             <div className="question-container">
                 <div className="question-top">
                     <span className="section-tag">DIAGNÓSTICO · PASO 3</span>
-                    <span className="question-counter">
-                        Pregunta {historial.length + 1}
-                    </span>
+                    <span className="question-counter">Pregunta {historial.length + 1}</span>
                 </div>
 
                 <p className="question-device">Equipo seleccionado: {nombreEquipo}</p>
-
                 <h1>{pregunta.titulo}</h1>
                 <p>Selecciona la respuesta que mejor describa tu situación.</p>
 
