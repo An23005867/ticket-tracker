@@ -1,11 +1,15 @@
-
-import { useState } from 'react';
+import { lazy, Suspense, useEffect, useState } from 'react';
 import SeleccionEquipo from './components/SeleccionEquipo';
 import InformacionEquipo from './components/InformacionEquipo';
 import SeleccionCategoria from './components/SeleccionCategoria';
 import Cuestionario from './components/Cuestionario';
+import AccesoTecnico from './components/AccesoTecnico';
+import { obtenerTecnico, cerrarSesion } from './services/auth';
+import { supabase } from './services/supabase';
 import cuestionarios from './data/cuestionarios';
 import './App.css';
+
+const PanelTecnico = lazy(() => import('./components/PanelTecnico'));
 
 const datosIniciales = {
     marca: '',
@@ -19,6 +23,48 @@ function App() {
     const [tipoEquipo, setTipoEquipo] = useState('');
     const [datosEquipo, setDatosEquipo] = useState({ ...datosIniciales });
     const [categoria, setCategoria] = useState('');
+    const [tecnico, setTecnico] = useState(null);
+    const [verificandoSesion, setVerificandoSesion] = useState(true);
+    const [cerrandoSesion, setCerrandoSesion] = useState(false);
+    const [errorSesion, setErrorSesion] = useState('');
+
+    useEffect(() => {
+        let activo = true;
+
+        async function recuperarSesion() {
+            try {
+                const usuario = await obtenerTecnico();
+                if (!activo) return;
+
+                if (usuario) {
+                    setTecnico(usuario);
+                    setPantalla('panel-tecnico');
+                }
+            } catch {
+                if (activo) {
+                    setErrorSesion('No se pudo verificar la sesión.');
+                }
+            } finally {
+                if (activo) setVerificandoSesion(false);
+            }
+        }
+
+        recuperarSesion();
+
+        const { data: { subscription } } = supabase.auth.onAuthStateChange(
+            (evento) => {
+                if (evento === 'SIGNED_OUT') {
+                    setTecnico(null);
+                    setPantalla('inicio');
+                }
+            }
+        );
+
+        return () => {
+            activo = false;
+            subscription.unsubscribe();
+        };
+    }, []);
 
     function cambiarPantalla(destino) {
         setPantalla(destino);
@@ -43,18 +89,74 @@ function App() {
         cambiarPantalla('cuestionario');
     }
 
+    function accesoAutorizado(usuario) {
+        setTecnico(usuario);
+        setErrorSesion('');
+        cambiarPantalla('panel-tecnico');
+    }
+
+    async function salirDelPanel() {
+        if (cerrandoSesion) return;
+
+        setCerrandoSesion(true);
+        setErrorSesion('');
+
+        try {
+            await cerrarSesion();
+            setTecnico(null);
+            cambiarPantalla('inicio');
+        } catch (error) {
+            setErrorSesion(error.message);
+        } finally {
+            setCerrandoSesion(false);
+        }
+    }
+
+    if (verificandoSesion) {
+        return (
+            <div className="site-container">
+                <main className="how-section">
+                    <div className="section-heading">
+                        <h1>Verificando sesión...</h1>
+                        <p>Espera un momento.</p>
+                    </div>
+                </main>
+            </div>
+        );
+    }
+
     return (
         <div className="site-container">
             <header className="navbar">
-                <a className="brand" href="#inicio" onClick={() => cambiarPantalla('inicio')}>
+                <a
+                    className="brand"
+                    href="#inicio"
+                    onClick={() => cambiarPantalla('inicio')}
+                >
                     <span className="brand-icon">DT</span>
                     <span>Diagnóstico Técnico</span>
                 </a>
 
                 <nav className="nav-links" aria-label="Navegación principal">
-                    <a href="#inicio" onClick={() => cambiarPantalla('inicio')}>Inicio</a>
-                    <a href="#como-funciona" onClick={() => cambiarPantalla('inicio')}>
+                    <a
+                        href="#inicio"
+                        onClick={() => cambiarPantalla('inicio')}
+                    >
+                        Inicio
+                    </a>
+
+                    <a
+                        href="#como-funciona"
+                        onClick={() => cambiarPantalla('inicio')}
+                    >
                         ¿Cómo funciona?
+                    </a>
+
+                    <a
+                        href="#acceso-tecnico"
+                        onClick={() => cambiarPantalla(tecnico ? 'panel-tecnico' : 'acceso-tecnico')}
+                    >
+                        {tecnico ? 'Panel técnico' : 'Acceso técnico'}
                     </a>
                 </nav>
             </header>
@@ -64,7 +166,9 @@ function App() {
                     <>
                         <section className="hero" id="inicio">
                             <div className="hero-content">
-                                <span className="hero-tag">SOPORTE TÉCNICO INTELIGENTE</span>
+                                <span className="hero-tag">
+                                    SOPORTE TÉCNICO INTELIGENTE
+                                </span>
 
                                 <h1>Entiende qué le pasa a tu computadora.</h1>
 
@@ -115,7 +219,9 @@ function App() {
                             <div className="section-heading">
                                 <span className="section-tag">PROCESO SENCILLO</span>
                                 <h2>¿Cómo funciona?</h2>
-                                <p>Tres pasos para entender mejor el problema de tu computadora.</p>
+                                <p>
+                                    Tres pasos para entender mejor el problema de tu computadora.
+                                </p>
                             </div>
 
                             <div className="steps-grid">
@@ -189,11 +295,47 @@ function App() {
                         volver={() => cambiarPantalla('categoria')}
                     />
                 )}
+
+                {pantalla === 'acceso-tecnico' && (
+                    <AccesoTecnico
+                        onAcceso={accesoAutorizado}
+                        volver={() => cambiarPantalla('inicio')}
+                    />
+                )}
+
+                {pantalla === 'panel-tecnico' && tecnico && (
+                    <Suspense
+                        fallback={
+                            <section className="how-section">
+                                <div className="section-heading">
+                                    <h2>Cargando panel administrativo...</h2>
+                                    <p>Preparando las herramientas de soporte técnico.</p>
+                                </div>
+                            </section>
+                        }
+                    >
+                        <PanelTecnico
+                            tecnico={tecnico}
+                            salir={salirDelPanel}
+                        />
+                    </Suspense>
+                )}
+
+                {errorSesion && pantalla !== 'panel-tecnico' && (
+                    <p
+                        role="alert"
+                        style={{ textAlign: 'center', color: '#B94A48' }}
+                    >
+                        {errorSesion}
+                    </p>
+                )}
             </main>
 
             <footer className="footer">
                 <span>Diagnóstico Técnico</span>
-                <p>Orientación técnica para computadoras de escritorio y laptops.</p>
+                <p>
+                    Orientación técnica para computadoras de escritorio y laptops.
+                </p>
             </footer>
         </div>
     );

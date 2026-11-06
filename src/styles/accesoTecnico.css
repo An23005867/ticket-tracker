@@ -1,0 +1,128 @@
+.acceso-section {
+    min-height: 70vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 70px 20px;
+}
+
+.acceso-card {
+    width: 100%;
+    max-width: 480px;
+    padding: 42px;
+    background: #F8F6F0;
+    border: 2px solid #292638;
+    border-radius: 28px;
+    box-shadow: 7px 7px 0 #292638;
+    text-align: center;
+}
+
+.acceso-icono {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 64px;
+    height: 64px;
+    margin: 0 auto 22px;
+    background: #DCD4FF;
+    border: 2px solid #292638;
+    border-radius: 20px;
+    font-size: 22px;
+    font-weight: 800;
+    color: #292638;
+}
+
+.acceso-card h1 {
+    margin: 18px 0 12px;
+    font-size: clamp(25px, 4vw, 34px);
+    color: #292638;
+}
+
+.acceso-descripcion {
+    margin: 0 auto 30px;
+    max-width: 340px;
+    color: #5F5A6D;
+    line-height: 1.6;
+}
+
+.acceso-formulario {
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+    gap: 12px;
+}
+
+.acceso-formulario label {
+    font-weight: 700;
+    color: #292638;
+    font-size: 14px;
+}
+
+.acceso-formulario input {
+    width: 100%;
+    padding: 14px 16px;
+    border: 2px solid #292638;
+    border-radius: 12px;
+    background: #FFFFFF;
+    color: #292638;
+    font: inherit;
+    outline: none;
+    transition: box-shadow 0.2s;
+}
+
+.acceso-formulario input:focus {
+    box-shadow: 3px 3px 0 #DCD4FF;
+}
+
+.acceso-formulario input:disabled {
+    opacity: 0.65;
+    cursor: not-allowed;
+}
+
+.acceso-boton {
+    width: 100%;
+    margin-top: 12px;
+    justify-content: center;
+}
+
+.acceso-boton:disabled {
+    opacity: 0.65;
+    cursor: wait;
+}
+
+.acceso-error {
+    padding: 12px;
+    margin: 4px 0;
+    border: 2px solid #B94A48;
+    border-radius: 12px;
+    background: #FFE0DC;
+    color: #872D2B;
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.acceso-volver {
+    margin-top: 25px;
+    border: none;
+    background: transparent;
+    color: #5F5A6D;
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.acceso-volver:hover {
+    color: #292638;
+    text-decoration: underline;
+}
+
+@media (max-width: 520px) {
+    .acceso-section {
+        padding: 45px 18px;
+    }
+
+    .acceso-card {
+        padding: 30px 22px;
+        box-shadow: 5px 5px 0 #292638;
+    }
+}
